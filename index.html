@@ -2,27 +2,130 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Logotipo BE</title>
+    <title>Gráficos Financeiros</title>
+    <style>
+        body { background: #f9f9f9; font-family: Arial, sans-serif; }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .grafico {
+            flex: 0 0 48%;
+            box-sizing: border-box;
+            margin: 20px 0;
+            text-align: center;
+        }
+        img { border: 4px solid #ccc; background: #fff; max-width: 95%; cursor: pointer; transition: box-shadow 0.2s; }
+        img:hover { box-shadow: 0 0 12px #2ec4b6; }
+        h1, h3 { color: #123366; text-align: center;}
+        h3 { margin: 10px 0 0 0; font-size: 1.1em; }
+        .degrade-linha {
+            height: 3px;
+            width: 100%;
+            margin: 0 auto 30px auto;
+            border: none;
+            background: linear-gradient(90deg, #123366 0%, #2ec4b6 100%);
+            border-radius: 2px;
+        }
+        /* Fullscreen overlay styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(18,51,102,0.85);
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay img {
+            max-width: 95vw;
+            max-height: 90vh;
+            border: 8px solid #fff;
+            background: #fff;
+            box-shadow: 0 0 40px #123366;
+        }
+        .overlay:target, .overlay.active {
+            display: flex;
+        }
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            color: #fff;
+            font-size: 3em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            text-shadow: 0 0 10px #123366;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #2ec4b6;
+        }
+    </style>
 </head>
-<body style="background:#f9f9f9;">
-<svg width="100" height="150" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-    <!-- Bandeira de Portugal (metade superior, transparente) -->
-    <rect x="0" y="15" width="100" height="60" fill="#006600" fill-opacity="0.3"/>
-    <rect x="40" y="15" width="60" height="60" fill="#FF0000" fill-opacity="0.3"/>
-    <!-- Círculo amarelo central (simbolizando o brasão) -->
-    <circle cx="35" cy="37" r="13" fill="#FFCC00" fill-opacity="0.3"/>
-    <!-- Bandeira do Brasil (metade inferior, transparente) -->
-    <rect x="0" y="75" width="100" height="60" fill="#009739" fill-opacity="0.3"/>
-    <!-- Losango amarelo -->
-    <polygon points="50,75 90,100 50,130 10,100" fill="#FFCC29" fill-opacity="0.3"/>
-    <!-- Círculo azul -->
-    <circle cx="50" cy="100" r="18" fill="#3E4095" fill-opacity="0.3"/>
-    <!-- Letra B em azul escuro, bordas arredondadas -->
-    <text x="10" y="100" font-size="110" font-family="Arial Rounded MT Bold, Arial, sans-serif"
-          fill="#123366" fill-opacity="1" font-weight="bold" stroke="#123366" stroke-width="1" rx="10" ry="10">B</text>
-    <!-- Letra E em verde água, sobreposta na metade de baixo da B, bordas arredondadas -->
-    <text x="24" y="125" font-size="90" font-family="Arial Rounded MT Bold, Arial, sans-serif"
-          fill="#2ec4b6" fill-opacity="0.5" font-weight="bold" stroke="#2ec4b6" stroke-width="1" rx="10" ry="10">E</text>
-</svg>
-</body>
-</html>
+<body>
+    <h1>Gráficos Financeiros </h1>    
+    <div class="container">
+        <div class="grafico">
+            <img src="Entradas.png" alt="Entradas" onclick="expandir(this)">
+            <h3>Entradas</h3>
+        </div>
+        <div class="degrade-linha"></div>
+        <div class="grafico">
+            <img src="Receitas.png" alt="Receitas" onclick="expandir(this)">
+            <h3>Receitas</h3>
+        </div>
+        </div>
+        <div class="degrade-linha"></div>
+        <div class="grafico">
+            <img src="Aporte.png" alt="Aporte" onclick="expandir(this)">
+            <h3>Aporte</h3>
+        </div>
+        </div>
+        <div class="degrade-linha"></div>
+        <div class="grafico">
+            <img src="Despesas.png" alt="Despesas" onclick="expandir(this)">
+            <h3>Despesas</h3>
+        </div>
+        </div>
+        <div class="degrade-linha"></div>
+        <div class="grafico">
+            <img src="OPEX.png" alt="OPEX" onclick="expandir(this)">
+            <h3>OPEX</h3>
+        </div>
+        <div class="grafico">
+            <img src="CAPEX.png" alt="CAPEX" onclick="expandir(this)">
+            <h3>CAPEX</h3>
+        </div>
+        <div class="grafico">
+            <img src="Impostos.png" alt="Impostos" onclick="expandir(this)">
+            <h3>Impostos</h3>
+        </div>
+        <div class="degrade-linha"></div>
+    </div>
+    <!-- Overlay para fullscreen -->
+    <div class="overlay" id="overlay" onclick="fechar()">
+        <span class="close-btn" onclick="fechar()">&times;</span>
+        <img id="img-expandida" src="" alt="Gráfico em tela cheia">
+    </div>
+    <script>
+        function expandir(img) {
+            var overlay = document.getElementById('overlay');
+            var imgExpandida = document.getElementById('img-expandida');
+            imgExpandida.src = img.src;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function fechar() {
+            var overlay = document.getElementById('overlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        // Fecha ao pressionar ESC
+        document.addEventListener('keydown', function(e){
+            if(e.key === "Escape") fechar();
+        });
+    </script>

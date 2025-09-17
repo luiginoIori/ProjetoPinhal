@@ -1,13 +1,13 @@
 import openpyxl
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 import webbrowser
 import locale
 import matplotlib.image as mpimg
 import os
+import csv
+
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-# ...existing code...
 # Caminho do arquivo Excel
 arquivo_excel = 'Energy - Orçado x Realizado.xlsx'
 
@@ -57,7 +57,7 @@ def dados(pos):
     return Realizadas,orcado      
 
 descricoes = ['Entradas','Receitas','Aporte','Despesas','OPEX','CAPEX','Impostos']
-
+resumo = [] 
 for j in descricoes:
     linha = j
     
@@ -69,7 +69,7 @@ for j in descricoes:
             labels = []
             razao = 0
             # Soma dos valores
-                
+             
             if linha == 'Despesas' or linha == 'OPEX' or linha == 'CAPEX'  or linha == 'Aporte' or linha == 'Impostos' or linha == 'Receitas' or linha == 'Entradas':
                 soma_real = sum(Entradas_Real)
                 soma_orca = sum(Entradas_Orca)
@@ -77,6 +77,7 @@ for j in descricoes:
                 # Evita divisão por zero
                 if soma_real != 0:
                     razao =  soma_real /soma_orca
+                    resumo.append([linha,soma_orca,soma_real,razao])
                 else:
                     razao = 0
 
@@ -144,17 +145,36 @@ for j in descricoes:
                 pass  # Não adiciona logotipo se não encontrar o arquivo
 
             plt.tight_layout()
-            plt.savefig(linha + '.png')
+            plt.savefig(f'Imagens/{linha}.png')
             #plt.show()
             plt.close()
+            
+            # Gráficos de linha
+            try:
+                plt.figure(figsize=(8,4))
+                plt.plot(labels, Entradas_Real, marker='o', color='navy', label='Realizadas')
+                plt.plot(labels, Entradas_Orca, marker='o', color='green', label='Orçadas')
+                plt.title(f'Gráfico de Linha - {linha}')
+                plt.xlabel('Meses')
+                plt.ylabel('Valores')
+                plt.legend()
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(f'Imagens/{linha}_linha.png')
+                plt.close()
+            except Exception as e:
+                print(f'Erro ao gerar gráfico de linha para {linha}:', e)
+
 #nome = 'graficos.html'
 #webbrowser.open(f'd:\Controle Energy\{nome}')
-
-
+with open('resumo.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Categoria', 'Total Orçado', 'Total Realizado', 'Razao'])
+    writer.writerows(resumo)
+'''
 nome = 'index.html'
 html_path = os.path.abspath(nome)
 print(html_path)
 webbrowser.open(f'file:///{html_path}')
             
-   
-            
+   '''
