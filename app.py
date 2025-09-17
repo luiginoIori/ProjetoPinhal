@@ -135,12 +135,6 @@ if page == "Resumo":
                 with col2:
                     st.metric(f"{nome} Realizado no Período", f"R$ {soma_realizado:,.0f}".replace(",", "."))
                 
-                
-                
-                
-                
-                
-                
             with col3:
                 st.metric(f"Execução {nome} (%)", f"{percentual:.1f}%")
         else:
@@ -181,15 +175,12 @@ elif page == "Gráficos":
             fig_bar = go.Figure()
             fig_bar.add_trace(go.Bar(
                 x=labels, y=realizadas, name='Realizadas', marker_color='navy',
-                
                 text=[str(v) if nome == "INSTALAÇÕES" else (f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v)) for v in realizadas],
-                
-                
                 textposition='outside', textfont=dict(color='navy', size=20)
-))
+                ))
             fig_bar.add_trace(go.Bar(
                 x=labels, y=orcado, name='Orçadas', marker_color='green', opacity=0.5
-            ))
+                ))
             fig_bar.update_layout(barmode='group', xaxis_title='Meses', yaxis_title='Valores', legend_title='Legenda')
             st.plotly_chart(fig_bar, use_container_width=True)
         with col_linha:
@@ -223,5 +214,6 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
