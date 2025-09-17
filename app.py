@@ -5,23 +5,18 @@ import os
 import csv
 import glob
 import datetime
-import openpyxl
-import matplotlib.pyplot as plt
-import webbrowser
-import locale
-import matplotlib.image as mpimg
-import os
-import csv
-
-
 import base64
-# Executa o ControlePinhal.py apenas uma vez na abertura do app
-if 'controlepinhal_rodado' not in st.session_state:
-    subprocess.run(["python", "ControlePinhal.py"], check=True)
-    st.session_state['controlepinhal_rodado'] = True
 
+
+from ControlePinhal import ControlePinhal
+
+# Configuração da página
 st.set_page_config(layout="wide", page_title="Projeto Pinhal")
 
+# Executa ControlePinhal() apenas uma vez por sessão
+if 'controlepinhal_rodado' not in st.session_state:
+    ControlePinhal()
+    st.session_state['controlepinhal_rodado'] = True
 # Lê o resumo
 resumo_dict = {}
 with open('resumo.csv', encoding='utf-8') as f:
