@@ -14,8 +14,6 @@ import matplotlib.image as mpimg
 import os
 import csv
 
-from ControlePinhal import ControlePinhal
-
 def ControlePinhal():
     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     # Caminho do arquivo Excel
@@ -477,3 +475,4 @@ def ControlePinhal():
     webbrowser.open(f'file:///{html_path}')
                 
     '''
+
