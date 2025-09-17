@@ -227,7 +227,7 @@ if not st.session_state['autenticado']:
     st.markdown('<h2 style="color:#123366;">Acesso Restrito</h2>', unsafe_allow_html=True)
     senha = st.text_input('Digite a senha para acessar o painel:', type='password')
     if st.button('Entrar'):
-        if senha == 'Pinhal2025':  # Troque por uma senha forte
+        if senha == 'Pinhal':  # Troque por uma senha forte
             st.session_state['autenticado'] = True
             st.success('Acesso liberado!')
             #st.experimental_rerun()
@@ -291,6 +291,7 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
 
