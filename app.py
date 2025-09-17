@@ -14,6 +14,7 @@ import matplotlib.image as mpimg
 import os
 import csv
 
+
 def ControlePinhal():
     #locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     # Caminho do arquivo Excel
@@ -262,16 +263,14 @@ elif page == "Gráficos":
             st.markdown('<div style="text-align:center; font-weight:bold; color:#123366;">Barras</div>', unsafe_allow_html=True)
             if os.path.exists(img_path):
                 img = Image.open(img_path)
-                width = int(img.width * 0.8)
-                st.image(img, width=width, caption=nome)
+                st.image(img, use_container_width=True, caption=nome)
             else:
                 st.warning(f"Gráfico {nome}.png não encontrado.")
         with col_linha:
             st.markdown('<div style="text-align:center; font-weight:bold; color:#2ec4b6;">Linha</div>', unsafe_allow_html=True)
             if os.path.exists(linha_path):
                 img_linha = Image.open(linha_path)
-                width_linha = int(img_linha.width * 0.8)
-                st.image(img_linha, width=width_linha, caption=nome+" (linha)")
+                st.image(img_linha, use_container_width=True, caption=nome+" (linha)")
             else:
                 st.warning(f"Gráfico {nome}_linha.png não encontrado.")
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
@@ -290,8 +289,5 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
-
-
-
 
 
