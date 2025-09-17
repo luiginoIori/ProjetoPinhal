@@ -15,7 +15,7 @@ import os
 import csv
 import plotly.graph_objects as go
 
-descricoes = ['Entradas','Receitas','Aporte','Despesas','OPEX ADM', "OPEX OPERACIONAL",'CAPEX','Impostos']
+descricoes = ['INSTALAÇÕES','Entradas','Receitas','Aporte','Despesas','OPEX ADM', "OPEX OPERACIONAL",'CAPEX','Impostos']
 def get_dados_graficos():
     import openpyxl
     arquivo_excel = 'Energy - Orçado x Realizado.xlsx'
@@ -123,10 +123,24 @@ if page == "Resumo":
             soma_orcado = sum(orcado)
             percentual = (soma_realizado / soma_orcado * 100) if soma_orcado != 0 else 0
             col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric(f"{nome} Orçado no Período", f"R$ {soma_orcado:,.0f}".replace(",", "."))
-            with col2:
-                st.metric(f"{nome} Realizado no Período", f"R$ {soma_realizado:,.0f}".replace(",", "."))
+            
+            if nome == "INSTALAÇÕES":
+                with col1:
+                    st.metric(f"{nome} Orçado no Período", f"{soma_orcado}")
+                with col2:
+                    st.metric(f"{nome} Realizado no Período", f"{soma_realizado}")
+            else:
+                with col1:
+                    st.metric(f"{nome} Orçado no Período", f"R$ {soma_orcado:,.0f}".replace(",", "."))
+                with col2:
+                    st.metric(f"{nome} Realizado no Período", f"R$ {soma_realizado:,.0f}".replace(",", "."))
+                
+                
+                
+                
+                
+                
+                
             with col3:
                 st.metric(f"Execução {nome} (%)", f"{percentual:.1f}%")
         else:
@@ -167,7 +181,10 @@ elif page == "Gráficos":
             fig_bar = go.Figure()
             fig_bar.add_trace(go.Bar(
                 x=labels, y=realizadas, name='Realizadas', marker_color='navy',
-                text=[f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v) for v in realizadas],
+                
+                text=[str(v) if nome == "INSTALAÇÕES" else (f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v)) for v in realizadas],
+                
+                
                 textposition='outside', textfont=dict(color='navy', size=20)
 ))
             fig_bar.add_trace(go.Bar(
