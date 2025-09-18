@@ -163,9 +163,9 @@ elif page == "Gráficos":
         with col1:
             st.metric("Soma Orçado", f"{soma_orcado:,##0.##0.###}".replace(",", "."))
         with col2:
-            st.metric("Soma Realizado", {soma_realizado:,.0f}".replace(",", "."))
+            st.metric("Soma Realizado",f"{soma_orcado:,##0.##0.###}".replace(",", "."))
         with col3:
-            st.metric("Diferença", f"{diferenca:,.0f}".replace(",", "."))
+            st.metric("Diferença", f"{soma_orcado:,##0.##0.###}".replace(",", "."))
         with col4:
             st.metric("% Executada", f"{percentual:.1f}%")
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
@@ -214,6 +214,7 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
 
