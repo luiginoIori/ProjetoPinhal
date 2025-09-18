@@ -161,7 +161,7 @@ elif page == "Gráficos":
         # Mostra os resumos acima dos gráficos
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Soma Orçado", f"{soma_orcado:,.0f}".replace(",", "."))
+            st.metric("Soma Orçado", f"{soma_orcado:,##0.##0.###}".replace(",", "."))
         with col2:
             st.metric("Soma Realizado", {soma_realizado:,.0f}".replace(",", "."))
         with col3:
@@ -214,6 +214,7 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
 
