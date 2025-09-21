@@ -24,7 +24,8 @@ def get_dados_graficos():
     aba = wb.active
     ultima_linha = aba.max_row
     ultima_coluna = aba.max_column
-
+    
+    
     
     posicoes = []
     for i in range(ultima_coluna):
@@ -35,7 +36,7 @@ def get_dados_graficos():
     dados = {}
     for j in descricoes:
         linha = j
-        print(j)
+        
         for i in range(len(posicoes)):
             if linha == posicoes[i]:
                 pos = posicoes[i+1]
@@ -63,7 +64,8 @@ def get_dados_graficos():
                     else:
                         labels.append(f'{k-2}-25')
                  
-                dados[linha] = {"labels": labels, "realizadas": realizadas, "orcado": orcado}   
+                dados[linha] = {"labels": labels, "realizadas": realizadas, "orcado": orcado}
+       
     return dados
 
 # Configuração da página
@@ -92,8 +94,9 @@ with st.sidebar:
     mes_anterior = hoje.replace(day=1) - datetime.timedelta(days=1)
     mes_anterior_str = mes_anterior.strftime('%m')
     st.markdown(f'<div style="font-size:1em; color:#123366; margin-bottom:0.5em;">Período: mês 10-24 até mês {mes_anterior_str}-25 </div>', unsafe_allow_html=True)
-    page = st.radio("Menu", ["Resumo", "Gráficos", "Balancetes"])
-
+    page = st.radio("Menu", ["Projeto Pinhal", "Resumo", "Gráficos", "Balancetes"])
+    
+    
 # Autenticação simples por senha
 if 'autenticado' not in st.session_state:
     st.session_state['autenticado'] = False
@@ -110,6 +113,121 @@ if not st.session_state['autenticado']:
             st.error('Senha incorreta!')
     st.stop()
 st.markdown('<h1 style="font-size: 4em; color:#123366; margin-bottom:0.2em; text-align:center;">Projeto Pinhal</h1>', unsafe_allow_html=True)
+
+
+
+if page == "Projeto Pinhal":
+    # --- Bloco das linhas 133 a 227 (tabela HTML dos dados da planilha) ---
+    arquivo_excel = 'Energy - Orçado x Realizado.xlsx'
+    wb = openpyxl.load_workbook(arquivo_excel, data_only=True)
+    aba = wb.active
+
+    # Descobrir até qual coluna a primeira linha tem "Realizado"
+    ultima_coluna = aba.max_column
+    colunas_validas = []
+    for col in range(1, ultima_coluna + 1):
+        valor = aba.cell(row=1, column=col).value
+        if valor == "Realizado":
+            colunas_validas.append(col)
+    if colunas_validas:
+        col_fim = colunas_validas[-1]
+    else:
+        col_fim = ultima_coluna
+
+    # Identificar colunas que NÃO começam com "Orçado"
+    colunas_para_mostrar = []
+    for j in range(1, col_fim + 1):
+        valor = aba.cell(row=1, column=j).value
+        if not (isinstance(valor, str) and valor.strip().lower().startswith("orçado")):
+            colunas_para_mostrar.append(j)
+    # Meses por extenso para linha 3
+    meses_extenso = [
+        "Outubro", "Novembro", "Dezembro", "Janeiro", "Fevereiro", "Março",
+        "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro"
+    ]
+
+    html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
+    html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
+    for i in range(1, 51):  # Linhas 1 a 50
+        if i in [1, 2]:
+            continue  # Pula a primeira e segunda linha
+
+        primeira_coluna = aba.cell(row=i, column=colunas_para_mostrar[0]).value
+        nome_linha = str(primeira_coluna).strip().upper() if isinstance(primeira_coluna, str) else ""
+        linhas_destaque = ["ENTRADAS", "DESPESAS", "RECEITAS", "APORTE", "OPEX ADM", "OPEX OPERACIONAL", "CAPEX", "IMPOSTOS", "COFINS-2172"]
+        is_destaque = nome_linha in linhas_destaque
+
+        # Estilo para linha dupla em negrito
+        row_style = 'font-weight:bold;' if is_destaque else ''
+        border_bottom = 'border-bottom:4px double #123366;' if is_destaque else ''
+
+        html += f'<tr style="height:4px; {row_style}">'
+        for idx, j in enumerate(colunas_para_mostrar):
+            valor = aba.cell(row=i, column=j).value     
+            # Linha 3: mostra meses por extenso da lista fixa a partir da coluna 3
+            if i == 3:
+                if idx >= 2 and (idx - 2) < len(meses_extenso):
+                    valor = meses_extenso[idx - 2]
+                else:
+                    valor = ""
+
+            # Formatação: sem casas decimais, negativos em vermelho
+            if isinstance(valor, (int, float)):
+                valor_formatado = f"{int(valor):,}".replace(",", ".") if nome_linha in ["ENTRADAS", "DESPESAS"] else f"{int(valor)}"
+                style_color = "color:red;" if valor < 0 else ""
+                align = "center"
+            else:
+                valor_formatado = valor if valor is not None else ""
+                style_color = ""
+                # Centraliza e azul marinho para Entradas/Despesas na primeira coluna
+                if idx == 0 and nome_linha in ["ENTRADAS", "DESPESAS"]:
+                    align = "center"
+                else:
+                    align = "left"
+
+            # Reduz o espaçamento (padding)
+            if i == 3:
+                style = f'background:#e6f0fa; font-weight:bold; padding:0.5px 3px; text-align:{align};' + style_color
+            else:
+                style = f'padding:1px 3px; text-align:{align};' + style_color
+
+            # Azul marinho e negrito para Entradas/Despesas na primeira coluna
+            if idx == 0 and nome_linha in ["ENTRADAS", "DESPESAS"]:
+                style += 'font-weight:bold; color:#123366;'
+
+            # Negrito para linhas especiais (exceto Entradas/Despesas, que já estão acima)
+            if is_destaque and not (nome_linha in ["ENTRADAS", "DESPESAS"] and idx == 0):
+                style += 'font-weight:bold;'
+
+            # Linha dupla em negrito para toda a linha de destaque
+            style += border_bottom
+
+            tag = 'th' if i == 3 else 'td'
+            html += f'<{tag} style="border:1px solid #ccc; {style}">{valor_formatado}</{tag}>'
+        html += '</tr>'
+    html += '</table></div>'
+
+    st.markdown(html, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if page == "Resumo":
     st.markdown('<h1 style="font-size:2em; color:#123366; margin-bottom:0.2em; text-align:center;">Resumo Financeiro</h1>', unsafe_allow_html=True)
@@ -174,8 +292,8 @@ elif page == "Gráficos":
             st.markdown('<div style="text-align:center; font-weight:bold; color:#123366;">Barras</div>', unsafe_allow_html=True)
             fig_bar = go.Figure()
             fig_bar.add_trace(go.Bar(
-                x=labels, y=realizadas, name='Realizadas', marker_color='navy',
-                text=[str(v) if nome == "INSTALAÇÕES" else (f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v)) for v in realizadas],
+                x=labels, y=realizadas, name='Realizadas', marker_color='navy',                
+                text=[str(v) if nome == "INSTALAÇÕES" else (f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v)) for v in realizadas],                                
                 textposition='outside', textfont=dict(color='navy', size=20)
                 ))
             fig_bar.add_trace(go.Bar(
@@ -214,10 +332,5 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
-
-
-
-
-
 
 
