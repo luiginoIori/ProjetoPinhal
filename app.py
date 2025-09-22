@@ -48,14 +48,14 @@ def get_dados_graficos():
                     cel = aba.cell(row=1, column=k+1)
                     if cel.value == "Realizado":
                         valor = aba.cell(row=pos, column=k+1).value
-                        if valor < 0:
+                        if valor is not None and valor < 0:
                             valor = valor * -1
                         realizadas.append(int(valor) if valor else 0)
                     if cel.value == "Orçado":
                         valor = aba.cell(row=pos, column=k+1).value
                         if valor == None:
                             valor = 0                        
-                        if valor < 0:
+                        if valor is not None and valor < 0:
                             valor = valor * -1
                         orcado.append(int(valor) if valor else 0)
                 for k in range(len(realizadas)):
