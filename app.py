@@ -142,13 +142,9 @@ if page == "Projeto Pinhal":
             colunas_para_mostrar.append(j)
     # Meses por extenso para linha 3
     meses_extenso = [
-        "Total","Out-24", "Nov-24", "Dez-24", "Jan-25", "Fev-25", "Mar-25",
+        "Out-24", "Nov-24", "Dez-24", "Jan-25", "Fev-25", "Mar-25",
         "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25"
     ]
-    
-    
-    
-    
     
     
     
@@ -167,47 +163,59 @@ if page == "Projeto Pinhal":
     html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
     html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
     for i in range(1, 51):  # Linhas 1 a 50
-        if i in [1, 2]:
-            continue  # Pula a primeira e segunda linha
+        if i in [1]:
+            continue  # Pula a primeira linha
 
         primeira_coluna = aba.cell(row=i, column=colunas_para_mostrar[0]).value
         nome_linha = str(primeira_coluna).strip().upper() if isinstance(primeira_coluna, str) else ""
         linhas_destaque = ["ENTRADAS", "DESPESAS", "RECEITAS", "APORTE", "OPEX ADM", "OPEX OPERACIONAL", "CAPEX", "IMPOSTOS", "COFINS-2172"]
         is_destaque = nome_linha in linhas_destaque
-
-        # Estilo para linha dupla em negrito
         row_style = 'font-weight:bold;' if is_destaque else ''
-        border_bottom = 'border-bottom:4px double #123366;' if is_destaque else ''
+        border_bottom = 'border-bottom:4px double #123366;' if is_destaque or i == 2 else ''
 
         html += f'<tr style="height:4px; {row_style}">'
         for idx, j in enumerate(colunas_para_mostrar):
-            valor = aba.cell(row=i, column=j).value     
-            # Linha 3: mostra meses por extenso da lista fixa a partir da coluna 3
-            
-            if i == 3:
-                if idx >= 2 and (idx - 2) < len(meses_extenso):
-                    valor = meses_extenso[idx - 2]
-                else:
-                    valor = ""
+            valor = aba.cell(row=i, column=j).value
 
-            # Formatação: sem casas decimais, negativos em vermelho
-            if isinstance(valor, (int, float)):
+            # Linha 2: coluna 1 recebe "Saldo Bancário" em azul escuro e negrito
+            if i == 2 and idx == 0:
+                valor_formatado = '<span style="color:#123366; font-weight:bold;">Saldo Bancário</span>'
+                style_color = ""
+                align = "left"
+                style = f'font-weight:bold; border-bottom:4px double #123366; padding:1px 3px; text-align:{align};'
+            # Linha 2: demais colunas, valores em negrito, formata número com ponto
+            elif i == 2:
+                if isinstance(valor, (int, float)):
+                    valor_formatado = f"<b>{int(valor):,}".replace(",", ".") + "</b>"
+                    style_color = "color:red;" if valor < 0 else ""
+                    align = "center"
+                else:
+                    valor_formatado = f"<b>{valor if valor is not None else ''}</b>"
+                    style_color = ""
+                    align = "center"
+                style = f'font-weight:bold; border-bottom:4px double #123366; padding:1px 3px; text-align:{align};' + style_color
+            # Linha 3: meses por extenso da lista fixa a partir da coluna 3
+            elif i == 3:
+                if idx >= 2 and (idx - 2) < len(meses_extenso):
+                    valor_formatado = meses_extenso[idx - 2]
+                else:
+                    valor_formatado = ""
+                style_color = ""
+                align = "center"
+                style = f'background:#e6f0fa; font-weight:bold; padding:0.5px 3px; text-align:{align};'
+            # Demais linhas: formatação padrão
+            elif isinstance(valor, (int, float)):
                 valor_formatado = f"{int(valor):,}".replace(",", ".")
                 style_color = "color:red;" if valor < 0 else ""
                 align = "center"
+                style = f'padding:1px 3px; text-align:{align};' + style_color
             else:
                 valor_formatado = valor if valor is not None else ""
                 style_color = ""
-                # Centraliza e azul marinho para Entradas/Despesas na primeira coluna
                 if idx == 0 and nome_linha in ["ENTRADAS", "DESPESAS"]:
                     align = "center"
                 else:
                     align = "left"
-
-            # Reduz o espaçamento (padding)
-            if i == 3:
-                style = f'background:#e6f0fa; font-weight:bold; padding:0.5px 3px; text-align:{align};' + style_color
-            else:
                 style = f'padding:1px 3px; text-align:{align};' + style_color
 
             # Azul marinho e negrito para Entradas/Despesas na primeira coluna
@@ -218,12 +226,17 @@ if page == "Projeto Pinhal":
             if is_destaque and not (nome_linha in ["ENTRADAS", "DESPESAS"] and idx == 0):
                 style += 'font-weight:bold;'
 
-            # Linha dupla em negrito para toda a linha de destaque
-            style += border_bottom
+            # Linha dupla em negrito para toda a linha de destaque ou linha 2
+            if border_bottom and i != 2:
+                style += border_bottom
 
             tag = 'th' if i == 3 else 'td'
             html += f'<{tag} style="border:1px solid #ccc; {style}">{valor_formatado}</{tag}>'
         html += '</tr>'
+        
+        
+        
+        
     html += '</table></div>'
 
     st.markdown(html, unsafe_allow_html=True)
