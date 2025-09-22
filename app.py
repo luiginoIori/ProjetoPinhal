@@ -142,10 +142,28 @@ if page == "Projeto Pinhal":
             colunas_para_mostrar.append(j)
     # Meses por extenso para linha 3
     meses_extenso = [
-        "Outubro", "Novembro", "Dezembro", "Janeiro", "Fevereiro", "Março",
-        "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro"
+        "Total","Out-24", "Nov-24", "Dez-24", "Jan-25", "Fev-25", "Mar-25",
+        "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25"
     ]
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    html = '''
+        <style>
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background: #e6f0fa;
+            z-index: 2;
+        }
+        </style>
+    '''
     html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
     html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
     for i in range(1, 51):  # Linhas 1 a 50
@@ -165,6 +183,7 @@ if page == "Projeto Pinhal":
         for idx, j in enumerate(colunas_para_mostrar):
             valor = aba.cell(row=i, column=j).value     
             # Linha 3: mostra meses por extenso da lista fixa a partir da coluna 3
+            
             if i == 3:
                 if idx >= 2 and (idx - 2) < len(meses_extenso):
                     valor = meses_extenso[idx - 2]
@@ -173,7 +192,7 @@ if page == "Projeto Pinhal":
 
             # Formatação: sem casas decimais, negativos em vermelho
             if isinstance(valor, (int, float)):
-                valor_formatado = f"{int(valor):,}".replace(",", ".") if nome_linha in ["ENTRADAS", "DESPESAS"] else f"{int(valor)}"
+                valor_formatado = f"{int(valor):,}".replace(",", ".")
                 style_color = "color:red;" if valor < 0 else ""
                 align = "center"
             else:
@@ -208,25 +227,6 @@ if page == "Projeto Pinhal":
     html += '</table></div>'
 
     st.markdown(html, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if page == "Resumo":
@@ -279,11 +279,11 @@ elif page == "Gráficos":
         # Mostra os resumos acima dos gráficos
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Soma Orçado", f"{soma_orcado}")
+            st.metric("Soma Orçado", f"{soma_orcado:,.0f}".replace(",", "."))
         with col2:
-            st.metric("Soma Realizado", f"{soma_realizado}")
+            st.metric("Soma Realizado", f"{soma_realizado:,.0f}".replace(",", "."))
         with col3:
-            st.metric("Diferença", f"{diferenca}")
+            st.metric("Diferença", f"{diferenca:,.0f}".replace(",", "."))
         with col4:
             st.metric("% Executada", f"{percentual:.1f}%")
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
@@ -294,12 +294,22 @@ elif page == "Gráficos":
             fig_bar.add_trace(go.Bar(
                 x=labels, y=realizadas, name='Realizadas', marker_color='navy',                
                 text=[str(v) if nome == "INSTALAÇÕES" else (f"{v/1000:.1f}k" if abs(v) >= 1000 else str(v)) for v in realizadas],                                
-                textposition='outside', textfont=dict(color='navy', size=20)
+                textposition='outside', textfont=dict(color='navy', size=30)
                 ))
             fig_bar.add_trace(go.Bar(
                 x=labels, y=orcado, name='Orçadas', marker_color='green', opacity=0.5
                 ))
-            fig_bar.update_layout(barmode='group', xaxis_title='Meses', yaxis_title='Valores', legend_title='Legenda')
+            
+            
+            fig_bar.update_layout(
+                barmode='group',
+                xaxis_title='Meses',
+                yaxis_title='Valores',
+                legend_title='Legenda',
+                font=dict(size=60)  # aumenta o tamanho da fonte dos labels
+            )
+            
+            
             st.plotly_chart(fig_bar, use_container_width=True)
         with col_linha:
             st.markdown('<div style="text-align:center; font-weight:bold; color:#2ec4b6;">Linha</div>', unsafe_allow_html=True)
@@ -311,7 +321,18 @@ elif page == "Gráficos":
             fig_line.add_trace(go.Scatter(
                 x=labels, y=orcado, mode='lines+markers', name='Orçadas', line=dict(color='green')
             ))
-            fig_line.update_layout(xaxis_title='Meses', yaxis_title='Valores', legend_title='Legenda')
+            
+            
+            fig_line.update_layout(
+                xaxis_title='Meses',
+                yaxis_title='Valores',
+                legend_title='Legenda',
+                font=dict(size=60)  # aumenta o tamanho da fonte dos labels
+            )
+            
+            
+            
+            
             st.plotly_chart(fig_line, use_container_width=True)
     
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
