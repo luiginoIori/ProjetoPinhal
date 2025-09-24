@@ -94,7 +94,7 @@ with st.sidebar:
     mes_anterior = hoje.replace(day=1) - datetime.timedelta(days=1)
     mes_anterior_str = mes_anterior.strftime('%m')
     st.markdown(f'<div style="font-size:1em; color:#123366; margin-bottom:0.5em;">Período: mês 10-24 até mês {mes_anterior_str}-25 </div>', unsafe_allow_html=True)
-    page = st.radio("Menu", ["Projeto Pinhal", "Resumo", "Gráficos", "Balancetes"])
+    page = st.radio("Menu", ["Projeto Pinhal", "Resumo", "Gráficos", "Extratos Bancários"])
     
     
 # Autenticação simples por senha
@@ -146,10 +146,7 @@ if page == "Projeto Pinhal":
         "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25"
     ]
     
-    
-    
-    
-    
+        
     html = '''
         <style>
         .sticky-header th {
@@ -160,7 +157,7 @@ if page == "Projeto Pinhal":
         }
         </style>
     '''
-    html = '<h2 style="color:#123366; text-align:center;">Receitas e Despesas Realizadas - Fluxo Bancário 24/25</h2>'
+    html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
     html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
     for i in range(1, 51):  # Linhas 1 a 50
         if i in [1]:
@@ -351,22 +348,21 @@ elif page == "Gráficos":
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
         
         
-elif page == "Balancetes":
-    st.markdown('<h1 style="font-size:2em; color:#123366; margin-bottom:0.2em; text-align:center;">Balancetes - Upload, Visualização e Download</h1>', unsafe_allow_html=True)
+elif page == "Extratos Bancários":
+    st.markdown('<h1 style="font-size:2em; color:#123366; margin-bottom:0.2em; text-align:center;">Extratos Bancários - Upload, Visualização e Download</h1>', unsafe_allow_html=True)
 
-    uploaded_pdf = st.file_uploader("Faça upload de um PDF de balancete", type=["pdf"])
+    uploaded_pdf = st.file_uploader("Faça upload de um PDF de extrato bancário", type=["pdf"])
     if uploaded_pdf is not None:
         st.success(f"Arquivo '{uploaded_pdf.name}' enviado com sucesso!")
         st.download_button(f"Baixar {uploaded_pdf.name}", uploaded_pdf, file_name=uploaded_pdf.name)
+    
     st.markdown('<h3 style="font-size:1em; color:#123366; margin-bottom:0.2em;">Arquivos disponíveis:</h3>', unsafe_allow_html=True)
     import glob
-    pdfs = glob.glob("Balancetes/*.pdf")
+    pdfs = glob.glob("extratos/*.pdf")
     pdfs.sort(key=lambda x: os.path.basename(x).lower())
     for pdf in pdfs:
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
-
-
 
 
