@@ -160,7 +160,7 @@ if page == "Projeto Pinhal":
         }
         </style>
     '''
-    html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
+    html = '<h2 style="color:#123366; text-align:center;">Receita e Despesas Realizadas - Fluxo Bancário 24/25</h2>'
     html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
     for i in range(1, 51):  # Linhas 1 a 50
         if i in [1]:
@@ -366,5 +366,6 @@ elif page == "Balancetes":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
