@@ -358,11 +358,12 @@ elif page == "Extratos Bancários":
     
     st.markdown('<h3 style="font-size:1em; color:#123366; margin-bottom:0.2em;">Arquivos disponíveis:</h3>', unsafe_allow_html=True)
     import glob
-    pdfs = glob.glob("extratos/*.pdf")
+    pdfs = glob.glob("Extratos/*.pdf")
     pdfs.sort(key=lambda x: os.path.basename(x).lower())
     for pdf in pdfs:
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
