@@ -91,9 +91,8 @@ with st.sidebar:
     st.markdown("Projeto de Iluminação Espírito Santo de Pinhal - SP")
     st.markdown("---")
     hoje = datetime.datetime.now()
-    mes_anterior = hoje.replace(day=1) - datetime.timedelta(days=1)
-    mes_anterior_str = mes_anterior.strftime('%m')
-    st.markdown(f'<div style="font-size:1em; color:#123366; margin-bottom:0.5em;">Período: mês 10-24 até mês {mes_anterior_str}-25 </div>', unsafe_allow_html=True)
+    mes_atual_str = hoje.strftime('%m')
+    st.markdown(f'<div style="font-size:1em; color:#123366; margin-bottom:0.5em;">Período: mês 10-24 até mês {mes_atual_str}-25 </div>', unsafe_allow_html=True)
     page = st.radio("Menu", ["Projeto Pinhal", "Resumo", "Gráficos", "Extratos Bancários"])
     
     
@@ -143,7 +142,7 @@ if page == "Projeto Pinhal":
     # Meses por extenso para linha 3
     meses_extenso = [
         "Out-24", "Nov-24", "Dez-24", "Jan-25", "Fev-25", "Mar-25",
-        "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25"
+        "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25","Out-25", "Nov-25", "Dez-25"
     ]
     
         
@@ -159,20 +158,67 @@ if page == "Projeto Pinhal":
     '''
     html = '<h2 style="color:#123366; text-align:center;">Dados da Planilha Realizado 24/25</h2>'
     html += '<div style="overflow-x:auto;"><table style="border-collapse:collapse; width:100%;">'
+    
+    # Primeiro, encontra as linhas de APORTE e DESPESAS
+    linha_aporte = None
+    linha_despesas = None
+    for i in range(1, 51):
+        primeira_col = aba.cell(row=i, column=colunas_para_mostrar[0]).value
+        nome = str(primeira_col).strip().upper() if isinstance(primeira_col, str) else ""
+        if nome == "APORTE":
+            linha_aporte = i
+        elif nome == "DESPESAS":
+            linha_despesas = i
+            break
+    
     for i in range(1, 51):  # Linhas 1 a 50
         if i in [1]:
             continue  # Pula a primeira linha
 
         primeira_coluna = aba.cell(row=i, column=colunas_para_mostrar[0]).value
         nome_linha = str(primeira_coluna).strip().upper() if isinstance(primeira_coluna, str) else ""
+
         linhas_destaque = ["ENTRADAS", "DESPESAS", "RECEITAS", "APORTE", "OPEX ADM", "OPEX OPERACIONAL", "CAPEX", "IMPOSTOS", "COFINS-2172"]
         is_destaque = nome_linha in linhas_destaque
         row_style = 'font-weight:bold;' if is_destaque else ''
         border_bottom = 'border-bottom:4px double #123366;' if is_destaque or i == 2 else ''
 
         html += f'<tr style="height:4px; {row_style}">'
+        
+        # Calcula a soma para a coluna 2 (índice 1) incluindo TODAS as colunas de valores
+        if i != 2 and i != 3:  # Não é a linha de saldo bancário nem de meses
+            soma_linha = 0
+            
+            # Se for a linha APORTE, soma todas as linhas ENTRE APORTE e DESPESAS (não incluindo APORTE nem DESPESAS)
+            if nome_linha == "APORTE" and linha_aporte and linha_despesas:
+                for linha_soma in range(linha_aporte + 1, linha_despesas):
+                    for idx_soma, j_soma in enumerate(colunas_para_mostrar):
+                        if idx_soma >= 2:  # A partir da coluna 3 (índice 2)
+                            valor_soma = aba.cell(row=linha_soma, column=j_soma).value
+                            if isinstance(valor_soma, (int, float)):
+                                soma_linha += valor_soma if valor_soma else 0
+            else:
+                # Para outras linhas, soma apenas a própria linha
+                for idx_soma, j_soma in enumerate(colunas_para_mostrar):
+                    if idx_soma >= 2:  # A partir da coluna 3 (índice 2)
+                        valor_soma = aba.cell(row=i, column=j_soma).value
+                        if isinstance(valor_soma, (int, float)):
+                            soma_linha += valor_soma if valor_soma else 0
+        
         for idx, j in enumerate(colunas_para_mostrar):
             valor = aba.cell(row=i, column=j).value
+            
+            # Se for a linha APORTE, calcula a soma para CADA coluna individualmente
+            if nome_linha == "APORTE" and linha_aporte and linha_despesas and idx >= 2 and i != 2 and i != 3:
+                soma_coluna = 0
+                for linha_soma in range(linha_aporte + 1, linha_despesas):
+                    valor_soma = aba.cell(row=linha_soma, column=j).value
+                    if isinstance(valor_soma, (int, float)):
+                        soma_coluna += valor_soma if valor_soma else 0
+                valor = soma_coluna
+            # Substitui o valor da coluna 2 pela soma calculada (exceto linhas 2 e 3)
+            elif idx == 1 and i != 2 and i != 3:
+                valor = soma_linha
 
             # Linha 2: coluna 1 recebe "Saldo Bancário" em azul escuro e negrito
             if i == 2 and idx == 0:
@@ -341,8 +387,6 @@ elif page == "Gráficos":
             )
             
             
-            
-            
             st.plotly_chart(fig_line, use_container_width=True)
     
         st.markdown('<hr style="height:2px;border:none;background:linear-gradient(90deg,rgba(18,51,102,0.18) 0%,rgba(46,196,182,0.18) 100%);border-radius:1px;margin:1px 0 1px 0;">', unsafe_allow_html=True)
@@ -358,12 +402,11 @@ elif page == "Extratos Bancários":
     
     st.markdown('<h3 style="font-size:1em; color:#123366; margin-bottom:0.2em;">Arquivos disponíveis:</h3>', unsafe_allow_html=True)
     import glob
-    pdfs = glob.glob("Extratos/*.pdf")
+    pdfs = glob.glob("extratos/*.pdf")
     pdfs.sort(key=lambda x: os.path.basename(x).lower())
     for pdf in pdfs:
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
-
 
 
