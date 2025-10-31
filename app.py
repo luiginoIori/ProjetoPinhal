@@ -171,7 +171,7 @@ if page == "Projeto Pinhal":
             linha_despesas = i
             break
     
-    for i in range(1, 51):  # Linhas 1 a 50
+    for i in range(1, 61):  # Linhas 1 a 50
         if i in [1]:
             continue  # Pula a primeira linha
 
@@ -408,5 +408,6 @@ elif page == "Extratos Bancários":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
