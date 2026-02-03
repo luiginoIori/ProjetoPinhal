@@ -142,7 +142,7 @@ if page == "Projeto Pinhal":
     # Meses por extenso para linha 3
     meses_extenso = [
         "Out-24", "Nov-24", "Dez-24", "Jan-25", "Fev-25", "Mar-25",
-        "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25","Out-25", "Nov-25", "Dez-25"
+        "Abr-25", "Mai-25", "Jun-25", "Jul-25", "Ago-25", "Set-25","Out-25", "Nov-25", "Dez-25","Jan-26
     ]
     
         
@@ -408,5 +408,6 @@ elif page == "Extratos Bancários":
         nome_pdf = os.path.basename(pdf)
         with open(pdf, "rb") as f:
             st.download_button(f"Baixar {nome_pdf}", f, file_name=nome_pdf)
+
 
 
